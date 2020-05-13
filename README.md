@@ -15,3 +15,8 @@ Then run something like this:
 Now run:
 
     node run.js
+
+## What it looks like
+
+* [combined with front-matter](samples/combined/index.html)
+* [split without front-matter](samples/split/)
