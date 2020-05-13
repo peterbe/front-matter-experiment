@@ -14,6 +14,7 @@ def combine(root):
                 yaml = f.read()
             thing.unlink()
     if yaml or html:
+        assert yaml and html, root
         combined = f"---\n{yaml}---\n{html}"
         with open(root / "index.html", "w") as f:
             f.write(combined)

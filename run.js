@@ -3,12 +3,15 @@ const path = require("path");
 
 const fm = require("front-matter");
 const yaml = require("js-yaml");
+const mdify = require("mdify");
+const matter = require("gray-matter");
+const parser = require("parser-front-matter");
 
 function f1() {
   const m = new Map();
   for (const [folder, files] of walker("content-split")) {
     if (files.includes("index.yaml")) {
-      const metadata = yaml.load(
+      const metadata = yaml.safeLoad(
         fs.readFileSync(path.join(folder, "index.yaml"))
       );
       m.set(metadata.slug, folder);
@@ -34,9 +37,37 @@ function f3() {
   const m = new Map();
   for (const [folder, files] of walker("content-combined")) {
     if (files.includes("index.html")) {
-      const metadata = fm(
+      const metadata = mdify.parse(
+        fs.readFileSync(path.join(folder, "index.html"), "utf8"),
+        { html: false }
+      ).metadata;
+      m.set(metadata.slug, folder);
+    }
+  }
+  // console.log(m.size);
+}
+
+function f4() {
+  const m = new Map();
+  for (const [folder, files] of walker("content-combined")) {
+    if (files.includes("index.html")) {
+      const metadata = matter(
+        fs.readFileSync(path.join(folder, "index.html"), "utf8"),
+        { html: false }
+      ).data;
+      m.set(metadata.slug, folder);
+    }
+  }
+  // console.log(m.size);
+}
+
+function f5() {
+  const m = new Map();
+  for (const [folder, files] of walker("content-combined")) {
+    if (files.includes("index.html")) {
+      const metadata = parser.parseSync(
         fs.readFileSync(path.join(folder, "index.html"), "utf8")
-      ).attributes;
+      ).data;
       m.set(metadata.slug, folder);
     }
   }
@@ -97,10 +128,10 @@ function* walker(root, depth = 0) {
   }
 }
 
-const functions = [f1, f2];
+const functions = [f5, f4, f3, f1, f2];
 // const functions = [f1b, f2b];
 
-compareFunctions(functions, (iterations = 16));
+compareFunctions(functions, (iterations = 36));
 
 function compareFunctions(functions) {
   function fmt(ms) {
